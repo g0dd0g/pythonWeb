@@ -31,7 +31,7 @@ time.sleep(5)
 
 currency = ['KRW', 'USD']
 cur_text = ['한국 원(₩)', '미국 달러($)']
-cur_size = len(currency)
+cur_size = len(currency) 
 region = ['korea-central', 'korea-south']
 reg_text = ['한국 중부', '한국 남부']
 reg_size = len(region)
