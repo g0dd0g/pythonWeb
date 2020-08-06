@@ -17,7 +17,7 @@ driver = webdriver.Chrome('C:\python\chromedriver')
 driver.get("https://azure.microsoft.com/ko-kr/pricing/calculator")
 
 # 페이지가 로드되는 시간을 위하여 정지
-time.sleep(10)
+time.sleep(7)
 
 # Virtual-Machine 버튼 클릭하여 추가
 vm = driver.find_element_by_xpath('//*[@id="products-picker-panel"]/div[2]/div[2]/div[1]/div/div/div[1]/button')
@@ -37,18 +37,15 @@ reg_text = ['한국 중부', '한국 남부']
 reg_size = len(region)
 operatingSystem = driver.find_elements_by_css_selector('select[name=operatingSystem]>option')
 
+
 sel_region = Select(driver.find_element_by_xpath('//*[@name="region"]'))
 sel_currency = Select(driver.find_element_by_xpath('//*[@class="select currency-dropdown"]'))
 sel_os = Select(driver.find_element_by_xpath('//*[@name="operatingSystem"]'))
 sel_type = Select(driver.find_element_by_xpath('//*[@name="type"]'))
 sel_tier = Select(driver.find_element_by_xpath('//*[@name="tier"]'))
-sel_os = Select(driver.find_element_by_xpath('//*[@name="operatingSystem"]'))
 
 
-
-driver.find_element_by_css_selector("input[type='radio'][value='three-year']").click()
-
-col_text = ["통화", "지역", "운영 체제", "유형", "계층", "인스턴스"]
+col_text = ["통화", "지역", "운영 체제", "유형", "계층", "인스턴스", "인스턴스2", "인스턴스3"]
 index = 1
 
 # 머리글 추가
@@ -59,45 +56,50 @@ ws['D1'] = col_text[3]
 ws['E1'] = col_text[4]
 ws['F1'] = col_text[5]
 
+ws['G1'] = col_text[6]
+ws['H1'] = col_text[7]
 
 
-for cur in range(cur_size) :
-    sel_currency.select_by_value(currency[cur])
-    for reg in range(reg_size) :
-        sel_region.select_by_value(region[reg])
-        for osTag in operatingSystem :
-            sel_os.select_by_value(osTag.get_attribute('value'))
-            tpe = driver.find_elements_by_css_selector('select[name=type]>option')
-            for tpTag in tpe :
-                sel_type.select_by_value(tpTag.get_attribute('value'))
-                tier = driver.find_elements_by_css_selector('select[name=tier]>option')
-                for trTag in tier :
-                    sel_tier.select_by_value(trTag.get_attribute('value'))
-                    instance = driver.find_elements_by_css_selector('select[name=size]>option')
-                    for ins in instance :
-                        index += 1
-                        ws[f'A{index}'] = cur_text[cur]
-                        ws[f'B{index}'] = reg_text[reg]
-                        ws[f'C{index}'] = osTag.text
-                        ws[f'D{index}'] = tpTag.text
-                        ws[f'E{index}'] = trTag.text
-                        ws[f'F{index}'] = ins.text
+hours = driver.find_element_by_name("hours")
+hours.clear()
+hours.send_keys("1")
 
+sel_currency.select_by_value(currency[0])
+sel_region.select_by_value(region[0])
+sel_os.select_by_value('windows')
+sel_type.select_by_value('os-only')
+sel_tier.select_by_value('standard')
+
+sel_instance = Select(driver.find_element_by_xpath('//*[@name="size"]'))
+sel_instance.select_by_value('d8dv4')
+
+
+savings = driver.find_elements_by_class_name('savings-option')
+
+print(savings[0].find_element_by_class_name('text-heading5').text)
 """
-for osTag in operatingSystem :
-    os = osTag.get_attribute('value')
-    ws[f'{col[index]}1'] = os
-    sel_os.select_by_value(os)
-    tp = driver.find_elements_by_css_selector('select[name=type]>option')
-    
-    i = 3
-    for t in tp :
-        ws[f'{col[index]}{i}'] = t.text
-        i += 1
-    index += 1
+for s in savings :
+    print(s.find_element_by_class_name('text-heading5').text)
 """
 
-wb.save("Azure_Cal3.xlsx")
+index += 1
+ws[f'A{index}'] = currency[0]
+ws[f'B{index}'] = region[0]
+ws[f'C{index}'] = 'windows'
+ws[f'D{index}'] = 'os-only'
+ws[f'E{index}'] = 'standard'
+
+radio_com = savings[0].find_elements_by_css_selector('input')
+
+for rc in radio_com :
+    if rc.is_enabled() :
+        rc.click()
+        ws[f'F{index}'] = driver.find_element_by_css_selector('select[name=size]>option[value=d8dv4]').text
+    else :
+        ws[f'F{index}'] = "X"
+    index += 1          
+
+wb.save("test.xlsx")
 
 
 

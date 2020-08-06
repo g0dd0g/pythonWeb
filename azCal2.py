@@ -42,7 +42,6 @@ sel_currency = Select(driver.find_element_by_xpath('//*[@class="select currency-
 sel_os = Select(driver.find_element_by_xpath('//*[@name="operatingSystem"]'))
 sel_type = Select(driver.find_element_by_xpath('//*[@name="type"]'))
 sel_tier = Select(driver.find_element_by_xpath('//*[@name="tier"]'))
-sel_os = Select(driver.find_element_by_xpath('//*[@name="operatingSystem"]'))
 
 driver.find_element_by_css_selector("input[type='radio'][value='one-year']").click()
 

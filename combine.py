@@ -46,8 +46,6 @@ sel_os = Select(driver.find_element_by_xpath('//*[@name="operatingSystem"]'))
 
 
 
-driver.find_element_by_css_selector("input[type='radio'][value='three-year']").click()
-
 col_text = ["통화", "지역", "운영 체제", "유형", "계층", "인스턴스"]
 index = 1
 
@@ -97,7 +95,7 @@ for osTag in operatingSystem :
     index += 1
 """
 
-wb.save("Azure_Cal3.xlsx")
+wb.save("Combine.xlsx")
 
 
 
