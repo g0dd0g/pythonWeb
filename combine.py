@@ -3,7 +3,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from pprint import pprint
 from openpyxl import Workbook
-import time
+import time, copy
 
 def check_exists_license():
     try:
@@ -18,12 +18,11 @@ ws = wb.active
 ws.title = 'VM-List'
 
 # Webdriver 사용하여 접속
-#driver = webdriver.Chrome('C:\python\chromedriver')
-driver = webdriver.Chrome('C:\still\pythonWeb\chromedriver')
+driver = webdriver.Chrome('C:\pythonWeb\chromedriver')
 driver.get("https://azure.microsoft.com/ko-kr/pricing/calculator")
 
 # 페이지가 로드되는 시간을 위하여 정지
-time.sleep(6)
+time.sleep(8)
 
 # Virtual-Machine 버튼 클릭하여 추가
 vm = driver.find_element_by_xpath('//*[@id="products-picker-panel"]/div[2]/div[2]/div[1]/div/div/div[1]/button')
@@ -87,7 +86,10 @@ for cur in range(cur_size) :
                         for licTag in lic :
                             sel_license.select_by_value(licTag.get_attribute('value'))
                             instance = driver.find_elements_by_css_selector('select[name=size]>option')
-                            for ins in instance :
+                            ins_value = list()
+                            for va in instance :
+                                ins_value.append(va.get_attribute('value'))
+                            for ins in ins_value :
                                 row = list()
                                 savings = driver.find_elements_by_class_name('savings-option')
                                 save_len = len(savings)
@@ -96,8 +98,8 @@ for cur in range(cur_size) :
                                     if rc.is_enabled() :
                                         rc.click()
                                         sel_instance = Select(driver.find_element_by_xpath('//*[@name="size"]'))
-                                        sel_instance.select_by_value(ins.get_attribute('value'))
-                                        text = ins.text
+                                        sel_instance.select_by_value(ins)
+                                        text = driver.find_element_by_css_selector(f'select[name=size]>option[value={ins}').text
                                         row.append(text)
                                         info = text.split(',')
                                         row.append(info[0].split(':')[1].strip())
@@ -110,20 +112,20 @@ for cur in range(cur_size) :
                                         if savings[1].find_element_by_class_name('text-heading5').text[:2] == 'OS' :
                                             for k in range(1, save_len) :
                                                 radio_what = savings[k].find_elements_by_css_selector('input')
-                                                if radio_what[1].is_enabled() :
-                                                    row.append('X')
-                                                else :
+                                                if len(radio_what) > 1 and radio_what[1].is_enabled() :
                                                     row.append('O')
+                                                else :
+                                                    row.append('X')
                                                 row.append(savings[1].find_element_by_css_selector('div[class=total]>span').text)
                                             if save_len == 2 :
                                                 row.extend(['-', '-'])
                                         else :
                                             row.extend(['-', '-'])
                                             radio_what = savings[1].find_elements_by_css_selector('input')
-                                            if radio_what[1].is_enabled() :
-                                                row.append('X')
-                                            else :
+                                            if len(radio_what) > 1 and radio_what[1].is_enabled() :
                                                 row.append('O')
+                                            else :
+                                                row.append('X')
                                             row.append(savings[1].find_element_by_css_selector('div[class=total]>span').text)
                                     else :
                                         row.extend(['-', '-', '-', '-'])
@@ -138,7 +140,10 @@ for cur in range(cur_size) :
                                 index += 1
                     else :
                         instance = driver.find_elements_by_css_selector('select[name=size]>option')
-                        for ins in instance :
+                        ins_value = list()
+                        for va in instance :
+                            ins_value.append(va.get_attribute('value'))
+                        for ins in ins_value :
                             row = list()
                             savings = driver.find_elements_by_class_name('savings-option')
                             save_len = len(savings)
@@ -147,8 +152,8 @@ for cur in range(cur_size) :
                                 if rc.is_enabled() :
                                     rc.click()
                                     sel_instance = Select(driver.find_element_by_xpath('//*[@name="size"]'))
-                                    sel_instance.select_by_value(ins.get_attribute('value'))
-                                    text = ins.text
+                                    sel_instance.select_by_value(ins)
+                                    text = driver.find_element_by_css_selector(f'select[name=size]>option[value={ins}').text
                                     row.append(text)
                                     info = text.split(',')
                                     row.append(info[0].split(':')[1].strip())
@@ -161,20 +166,20 @@ for cur in range(cur_size) :
                                     if savings[1].find_element_by_class_name('text-heading5').text[:2] == 'OS' :
                                         for k in range(1, save_len) :
                                             radio_what = savings[k].find_elements_by_css_selector('input')
-                                            if radio_what[1].is_enabled() :
-                                                row.append('X')
-                                            else :
+                                            if len(radio_what) > 1 and radio_what[1].is_enabled() :
                                                 row.append('O')
+                                            else :
+                                                row.append('X')
                                             row.append(savings[1].find_element_by_css_selector('div[class=total]>span').text)
                                         if save_len == 2 :
                                             row.extend(['-', '-'])
                                     else :
                                         row.extend(['-', '-'])
                                         radio_what = savings[1].find_elements_by_css_selector('input')
-                                        if radio_what[1].is_enabled() :
-                                            row.append('X')
-                                        else :
+                                        if len(radio_what) > 1 and radio_what[1].is_enabled() :
                                             row.append('O')
+                                        else :
+                                            row.append('X')
                                         row.append(savings[1].find_element_by_css_selector('div[class=total]>span').text)
                                 else :
                                     row.extend(['-', '-', '-', '-'])
